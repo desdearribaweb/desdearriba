@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { isAuthenticated } from '@/app/lib/auth';
+import { isBlobConfigured } from '@/app/lib/blob';
 import {
   PROJECT_CATEGORIES,
   type Project,
   type ProjectCategory,
   getProjectsForAdmin,
-  isBlobConfigured,
   saveProjects,
 } from '@/app/lib/projects';
 

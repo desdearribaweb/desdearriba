@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { isAdminConfigured, isAuthenticated } from '@/app/lib/auth';
-import { blobTokenCandidates, getProjectsForAdmin, isBlobConfigured } from '@/app/lib/projects';
+import { blobEnvNames, blobMode } from '@/app/lib/blob';
+import { getProjectsForAdmin } from '@/app/lib/projects';
 import LoginForm from './LoginForm';
 import ProjectsEditor from './ProjectsEditor';
 
@@ -44,7 +45,7 @@ function Notice({ title, children }: { title: string; children: React.ReactNode 
 }
 
 function BlobDiagnosis() {
-  const found = blobTokenCandidates();
+  const found = blobEnvNames();
 
   return (
     <div className='mt-5 border-t border-neutral-800 pt-4 text-xs text-neutral-500'>
@@ -55,9 +56,11 @@ function BlobDiagnosis() {
         </p>
       ) : (
         <p>
-          Variables de storage detectadas:{' '}
-          <code className='text-neutral-300'>{found.join(', ')}</code>. Si ves esto, el token está
-          pero no se pudo usar: revisá que el store siga existiendo en Storage.
+          Este deploy ve estas variables:{' '}
+          <code className='text-neutral-300'>{found.join(', ')}</code>, pero ninguna sirve para
+          autenticar. Hace falta una que termine en{' '}
+          <code className='text-neutral-300'>_READ_WRITE_TOKEN</code> o{' '}
+          <code className='text-neutral-300'>_STORE_ID</code>.
         </p>
       )}
     </div>
@@ -114,7 +117,9 @@ export default async function AdminPage() {
     );
   }
 
-  if (!isBlobConfigured()) {
+  const mode = blobMode();
+
+  if (!mode) {
     return (
       <Shell>
         <Notice title='FALTA EL ALMACENAMIENTO'>
@@ -143,9 +148,28 @@ export default async function AdminPage() {
     );
   }
 
-  return (
-    <Shell>
-      <ProjectsEditor initialProjects={await getProjectsForAdmin()} />
-    </Shell>
-  );
+  try {
+    const projects = await getProjectsForAdmin();
+
+    return (
+      <Shell>
+        <ProjectsEditor initialProjects={projects} uploadMode={mode} />
+      </Shell>
+    );
+  } catch (error) {
+    return (
+      <Shell>
+        <Notice title='NO SE PUDO LEER EL ALMACENAMIENTO'>
+          <p>
+            Las credenciales del store llegaron, pero Vercel Blob rechazó la conexión. Suele pasar
+            cuando el store se borró o quedó conectado a otro proyecto.
+          </p>
+          <p className='text-neutral-500'>
+            Respuesta: <code>{error instanceof Error ? error.message : 'desconocida'}</code>
+          </p>
+          <BlobDiagnosis />
+        </Notice>
+      </Shell>
+    );
+  }
 }

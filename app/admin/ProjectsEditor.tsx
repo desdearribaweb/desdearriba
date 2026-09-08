@@ -2,7 +2,8 @@
 
 import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { upload } from '@vercel/blob/client';
+import { upload, uploadPresigned } from '@vercel/blob/client';
+import type { BlobMode } from '@/app/lib/blob';
 import { PROJECT_CATEGORIES, type Project, type ProjectCategory } from '@/app/lib/projects';
 
 const MAX_PROJECTS = 3;
@@ -76,14 +77,34 @@ async function posterFromVideo(file: File): Promise<File | null> {
   }
 }
 
-const uploadToBlob = async (file: File) =>
-  (await upload(file.name, file, { access: 'public', handleUploadUrl: '/api/admin/upload' })).url;
+/**
+ * El nombre se genera acá, no en el servidor: el token presignado se firma
+ * contra un pathname exacto, así que tiene que coincidir con el final.
+ */
+async function uploadToBlob(file: File, mode: BlobMode): Promise<string> {
+  const ext = (file.name.split('.').pop() ?? '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const pathname = `media/${crypto.randomUUID()}${ext ? `.${ext}` : ''}`;
+  const send = mode === 'token' ? upload : uploadPresigned;
+
+  const blob = await send(pathname, file, {
+    access: 'public',
+    handleUploadUrl: '/api/admin/upload',
+  });
+
+  return blob.url;
+}
 
 /** Safari reproduce .mov, pero Chrome y Android no: hay que convertirlo antes. */
 const isQuickTime = (file: File) =>
   file.type === 'video/quicktime' || /\.mov$/i.test(file.name);
 
-export default function ProjectsEditor({ initialProjects }: { initialProjects: Project[] }) {
+export default function ProjectsEditor({
+  initialProjects,
+  uploadMode,
+}: {
+  initialProjects: Project[];
+  uploadMode: BlobMode;
+}) {
   const router = useRouter();
   const [drafts, setDrafts] = useState<Draft[]>(() => toDrafts(initialProjects));
   const [status, setStatus] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
@@ -109,8 +130,8 @@ export default function ProjectsEditor({ initialProjects }: { initialProjects: P
       if (file.type.startsWith('video/')) {
         const poster = await posterFromVideo(file);
         const [video, image] = await Promise.all([
-          uploadToBlob(file),
-          poster ? uploadToBlob(poster) : Promise.resolve(''),
+          uploadToBlob(file, uploadMode),
+          poster ? uploadToBlob(poster, uploadMode) : Promise.resolve(''),
         ]);
         update(index, image ? { video, image } : { video });
 
@@ -121,7 +142,7 @@ export default function ProjectsEditor({ initialProjects }: { initialProjects: P
           });
         }
       } else {
-        update(index, { image: await uploadToBlob(file) });
+        update(index, { image: await uploadToBlob(file, uploadMode) });
       }
     } catch (error) {
       setStatus({
