@@ -1,5 +1,5 @@
 import { MessageCircle } from 'lucide-react';
-import { INSTAGRAM_URL, WHATSAPP_DISPLAY, whatsappLink } from '@/app/lib/contact';
+import { INSTAGRAM_URL, whatsappLink } from '@/app/lib/contact';
 
 export default function Contact() {
   return (
@@ -37,8 +37,6 @@ export default function Contact() {
             @_DESDEARRIBA_
           </a>
         </div>
-
-        <p className='mt-8 text-sm text-neutral-500'>{WHATSAPP_DISPLAY}</p>
       </div>
     </section>
   );
