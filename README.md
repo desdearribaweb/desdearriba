@@ -1,36 +1,230 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚁 DESDE ARRIBA - One Page Profesional
 
-## Getting Started
+**Fotografía y Filmación Aérea con Drones**
 
-First, run the development server:
+ONE PAGE responsivo, moderno y profesional para un emprendimiento de producción audiovisual aérea.
+
+---
+
+## ⚡ Stack Tecnológico
+
+- **Framework:** Next.js 15 (App Router)
+- **Lenguaje:** TypeScript
+- **Estilos:** Tailwind CSS 4
+- **Componentes:** React 19
+- **Iconografía:** Lucide React
+- **Deploy:** Vercel (recomendado)
+- **Tipografía:** Manrope (Google Fonts)
+
+---
+
+## 🎨 Características
+
+✨ **Design Premium**
+- Estética minimalista y cinematográfica
+- Paleta monocromática (Negro & Blanco)
+- Tipografía profesional (Manrope)
+- Alto contraste y legibilidad
+
+📱 **Totalmente Responsive**
+- Mobile-first design
+- Optimizado para 375px a 1920px+
+- Menú hamburguesa en mobile
+- Experiencia visual premium en todos los dispositivos
+
+🎬 **Optimizado para Multimedia**
+- Soporte para videos fullscreen
+- Galería de proyectos interactiva
+- Modal/Lightbox para proyectos
+- Lazy loading de imágenes
+
+🔗 **Integración de Contacto**
+- Botón flotante de WhatsApp
+- Links directos prearmados
+- Formulario visual
+- Instagram integrado
+
+🚀 **Performance**
+- Build optimizado (Next.js)
+- Imágenes comprimidas
+- Code splitting automático
+- Sitemap y robots.txt configurados
+
+♿ **Accesibilidad**
+- HTML semántico
+- ARIA labels
+- Contraste WCAG AA
+- Navegación por teclado
+
+📊 **SEO Completo**
+- Metadatos estructurados
+- OpenGraph y Twitter Cards
+- Datos estructurados (JSON-LD)
+- Sitemap XML y robots.txt
+
+---
+
+## 🚀 Inicio Rápido
+
+### Requisitos
+- Node.js 18+
+- npm o yarn
+
+### Instalación
 
 ```bash
+# Instalar dependencias
+npm install
+
+# Ejecutar servidor de desarrollo
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Abrir en el navegador
+# http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Build para Producción
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Crear build optimizado
+npm run build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Ejecutar build localmente
+npm start
+```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 📁 Estructura del Proyecto
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Ver `ESTRUCTURA_Y_GUIA.md` para documentación completa sobre:
+- Estructura de carpetas
+- Cómo cambiar textos
+- Cómo agregar imágenes y videos
+- Cómo agregar proyectos al portfolio
+- Cómo publicar en Vercel
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🎯 Secciones de la Página
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. **Header** - Navegación responsiva con sticky scroll
+2. **Hero** - Fullscreen cinematográfico con video
+3. **Introduction** - Presentación de la marca
+4. **Services** - Grid de 7 servicios
+5. **Portfolio** - Galería filtrable de proyectos
+6. **Formats** - Capacidad 4K horizontal y vertical
+7. **Equipment** - Especificaciones del DJI Mini 4 Pro
+8. **Editing** - Servicios de edición de video
+9. **Process** - Proceso en 4 pasos
+10. **CTA** - Sección call-to-action cinematográfica
+11. **Contact** - Múltiples métodos de contacto
+12. **Footer** - Links y copyright
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 🔗 Links Importantes
+
+**WhatsApp:** +54 9 3492 680779
+- Link: https://wa.me/5493492680779
+
+**Instagram:** @_desdearriba_
+- Link: https://instagram.com/_desdearriba_
+
+---
+
+## 📸 Personalización
+
+### Cambiar Textos
+Editar archivos de componentes en `app/components/` o datos en `app/data/`
+
+### Agregar Imágenes
+1. Colocar en `public/images/`
+2. Actualizar referencias en componentes
+
+### Agregar Videos
+1. Colocar MP4 en `public/videos/`
+2. Actualizar paths en `Hero.tsx` y `CTASection.tsx`
+
+### Agregar Proyectos
+Editar `app/data/projects.ts` y agregar nuevo objeto
+
+---
+
+## 🚀 Deployment en Vercel
+
+### Opción 1: Automatic Deployment
+1. Conectar repo en [vercel.com](https://vercel.com)
+2. Vercel deployará automáticamente en cada push
+
+### Opción 2: Manual
+```bash
+npm install -g vercel
+vercel
+```
+
+---
+
+## 🛠️ Comandos Útiles
+
+```bash
+# Desarrollo
+npm run dev          # Servidor en http://localhost:3000
+
+# Producción
+npm run build        # Build optimizado
+npm start           # Ejecutar build
+
+# Linting
+npm run lint        # Verificar código
+
+# Otros
+npm run format      # Formatear código (si está configurado)
+npm run typecheck   # Verificar tipos TypeScript
+```
+
+---
+
+## 📋 Checklist de Publicación
+
+- [ ] Reemplazar imágenes de servicios
+- [ ] Reemplazar imágenes de proyectos
+- [ ] Agregar videos (hero y CTA)
+- [ ] Actualizar textos principales
+- [ ] Verificar links de WhatsApp e Instagram
+- [ ] Probar responsive en mobile
+- [ ] Probar todos los links internos y externos
+- [ ] Verificar formulario de contacto
+- [ ] Hacer build (`npm run build`)
+- [ ] Deploy en Vercel
+- [ ] Configurar dominio personalizado
+- [ ] Verificar SEO y metadatos
+
+---
+
+## 💡 Tips
+
+- Las imágenes se optimizan automáticamente con Next.js `Image`
+- Videos deben ser MP4 optimizados (< 50MB)
+- Mantener nombres de archivo consistentes
+- Usar formato: `nombre-descriptivo.jpg` o `.mp4`
+- Los datos están centralizados para fácil actualización
+- Todos los componentes son reutilizables
+
+---
+
+## 📝 Licencia
+
+Este proyecto ha sido desarrollado específicamente para DESDE ARRIBA.
+
+---
+
+## 🤝 Soporte
+
+Para cambios o actualizaciones futuras, referir a `ESTRUCTURA_Y_GUIA.md` donde está documentada toda la estructura.
+
+---
+
+**Versión:** 1.0.0  
+**Última actualización:** 2025  
+**Status:** ✅ Listo para producción
