@@ -38,12 +38,45 @@ La portada se genera sola del primer frame del video: no hace falta subir una fo
 Subí el archivo ya comprimido (H.264, ~10-15 Mbps) en vez del crudo de la cámara:
 un 4K vertical de 20s queda en ~30 MB y carga rápido. El límite por archivo es 200 MB.
 
+### Tiene que ser .mp4, no .mov
+
+Un `.mov` se ve bien en Safari pero **Chrome y Android no lo reproducen**.
+Como no lo vas a notar desde tu Mac, el panel directamente no te deja subirlo.
+
+Para convertirlo, cualquiera de estas:
+
+**Si lo exportaste de un editor** (Final Cut, iMovie, Premiere, CapCut):
+volvé a exportar eligiendo **MP4 / H.264**. Es lo más rápido y sin pérdida extra.
+
+**Con iMovie** (ya viene en tu Mac): arrastrás el video → Compartir → Archivo → se
+guarda como `.mp4`.
+
+**Con Handbrake** (gratis, handbrake.fr): arrastrás el archivo, preset
+`Fast 1080p30` (o `Fast 2160p60 4K`), Start.
+
+**Por terminal**, si el `.mov` ya está en H.264 esto lo convierte en segundos
+sin recomprimir ni perder calidad:
+
+```bash
+ffmpeg -i entrada.mov -c copy salida.mp4
+```
+
+Si eso falla o el video queda sin verse, está en H.265 y hay que recomprimir:
+
+```bash
+ffmpeg -i entrada.mov -c:v libx264 -crf 23 -preset medium -c:a aac salida.mp4
+```
+
 ---
 
 ## Video del hero (el de fondo, arriba de todo)
 
 Subí tu archivo como `public/videos/hero.mp4` y hacé commit.
 Mientras no exista, el hero muestra un fondo negro degradado (no da error).
+
+Tiene que ser `.mp4` (mirá arriba cómo convertir un `.mov`), y conviene que sea
+corto y liviano: 10-15 segundos en loop, bajo 8 MB. Es lo primero que carga el
+sitio, así que un archivo pesado acá se nota más que en cualquier otro lado.
 
 En celular un video vertical entra perfecto; en desktop se recorta al centro,
 así que si tenés uno horizontal, mejor usá ese acá.

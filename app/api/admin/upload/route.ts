@@ -3,6 +3,7 @@ import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
 import { isAuthenticated } from '@/app/lib/auth';
 import { isBlobConfigured } from '@/app/lib/projects';
 
+// Sin video/quicktime a propósito: Chrome y Android no reproducen .mov.
 const ALLOWED = [
   'image/jpeg',
   'image/png',
@@ -10,7 +11,6 @@ const ALLOWED = [
   'image/avif',
   'video/mp4',
   'video/webm',
-  'video/quicktime',
 ];
 
 /**

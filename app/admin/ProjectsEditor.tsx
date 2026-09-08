@@ -79,6 +79,10 @@ async function posterFromVideo(file: File): Promise<File | null> {
 const uploadToBlob = async (file: File) =>
   (await upload(file.name, file, { access: 'public', handleUploadUrl: '/api/admin/upload' })).url;
 
+/** Safari reproduce .mov, pero Chrome y Android no: hay que convertirlo antes. */
+const isQuickTime = (file: File) =>
+  file.type === 'video/quicktime' || /\.mov$/i.test(file.name);
+
 export default function ProjectsEditor({ initialProjects }: { initialProjects: Project[] }) {
   const router = useRouter();
   const [drafts, setDrafts] = useState<Draft[]>(() => toDrafts(initialProjects));
@@ -90,6 +94,14 @@ export default function ProjectsEditor({ initialProjects }: { initialProjects: P
     setDrafts((prev) => prev.map((d, i) => (i === index ? { ...d, ...patch } : d)));
 
   async function handleFile(index: number, file: File) {
+    if (isQuickTime(file)) {
+      setStatus({
+        kind: 'error',
+        text: 'Los .mov no se reproducen en Chrome ni en Android. Convertilo a .mp4 (H.264) y subilo de nuevo.',
+      });
+      return;
+    }
+
     setBusy(index);
     setStatus(null);
 
