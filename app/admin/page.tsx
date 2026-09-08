@@ -43,20 +43,43 @@ function Notice({ title, children }: { title: string; children: React.ReactNode 
   );
 }
 
+function Step({ n, children }: { n: string; children: React.ReactNode }) {
+  return (
+    <li className='flex gap-3'>
+      <span className='shrink-0 font-black text-white'>{n}</span>
+      <span>{children}</span>
+    </li>
+  );
+}
+
 export default async function AdminPage() {
   if (!isAdminConfigured()) {
     return (
       <Shell>
-        <Notice title='FALTA CONFIGURAR EL PANEL'>
+        <Notice title='FALTA LA CONTRASEÑA'>
           <p>
-            Agregá la variable de entorno <code className='text-white'>ADMIN_PASSWORD</code> en
-            Vercel para poder entrar.
+            Este deploy no encuentra la variable{' '}
+            <code className='text-white'>ADMIN_PASSWORD</code>.
           </p>
-          <p>
-            Vercel → tu proyecto → <strong className='text-white'>Settings</strong> →{' '}
-            <strong className='text-white'>Environment Variables</strong> → New. Después hacé{' '}
-            <strong className='text-white'>Redeploy</strong>.
+
+          <p className='border-l-2 border-white pl-4 text-neutral-300'>
+            <strong className='text-white'>¿Ya la creaste y seguís viendo esto?</strong> Falta el
+            redeploy. Vercel aplica las variables solo a los deploys nuevos, así que el que está
+            publicado todavía no la tiene.
           </p>
+
+          <ol className='space-y-2 pt-1'>
+            <Step n='1.'>
+              Settings → Environment Variables. El nombre tiene que ser exactamente{' '}
+              <code className='text-white'>ADMIN_PASSWORD</code> y estar tildado{' '}
+              <strong className='text-white'>Production</strong>.
+            </Step>
+            <Step n='2.'>
+              Deployments → el primero de la lista → el botón <code className='text-white'>···</code>{' '}
+              → <strong className='text-white'>Redeploy</strong>.
+            </Step>
+            <Step n='3.'>Cuando termine, recargá esta página.</Step>
+          </ol>
         </Notice>
       </Shell>
     );
@@ -73,18 +96,25 @@ export default async function AdminPage() {
   if (!isBlobConfigured()) {
     return (
       <Shell>
-        <Notice title='FALTA CONECTAR EL ALMACENAMIENTO'>
+        <Notice title='FALTA EL ALMACENAMIENTO'>
           <p>
-            El panel necesita <strong className='text-white'>Vercel Blob</strong> para guardar las
-            fotos y videos.
+            La contraseña ya funciona. Falta conectar{' '}
+            <strong className='text-white'>Vercel Blob</strong>, que es donde se guardan las fotos
+            y los videos.
           </p>
-          <p>
-            Vercel → tu proyecto → <strong className='text-white'>Storage</strong> →{' '}
-            <strong className='text-white'>Create Database</strong> →{' '}
-            <strong className='text-white'>Blob</strong> → conectalo a este proyecto. Después hacé{' '}
-            <strong className='text-white'>Redeploy</strong>.
-          </p>
-          <p>La variable BLOB_READ_WRITE_TOKEN se agrega sola al conectarlo.</p>
+
+          <ol className='space-y-2 pt-1'>
+            <Step n='1.'>
+              Storage → <strong className='text-white'>Create Database</strong> →{' '}
+              <strong className='text-white'>Blob</strong> → conectalo a este proyecto. El token se
+              agrega solo.
+            </Step>
+            <Step n='2.'>
+              Deployments → el primero de la lista → <code className='text-white'>···</code> →{' '}
+              <strong className='text-white'>Redeploy</strong>.
+            </Step>
+            <Step n='3.'>Cuando termine, recargá esta página.</Step>
+          </ol>
         </Notice>
       </Shell>
     );
