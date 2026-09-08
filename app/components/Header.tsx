@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Menu, X } from 'lucide-react';
 
 export default function Header() {
@@ -41,9 +42,18 @@ export default function Header() {
         <div className='flex justify-between items-center h-16 sm:h-20'>
           {/* Logo */}
           <Link href='/' className='flex items-center'>
-            <div className='flex items-center gap-2'>
-              <div className='w-8 h-8 bg-white'></div>
-              <span className='text-white font-black text-sm sm:text-base tracking-widest'>
+            <div className='flex items-center gap-2 sm:gap-3'>
+              <div className='w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0'>
+                <Image
+                  src='/logo.svg'
+                  alt='DESDE ARRIBA'
+                  width={40}
+                  height={40}
+                  className='w-full h-full'
+                  priority
+                />
+              </div>
+              <span className='text-white font-black text-xs sm:text-sm tracking-widest whitespace-nowrap'>
                 DESDE ARRIBA
               </span>
             </div>

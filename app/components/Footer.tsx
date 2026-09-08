@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { MessageCircle } from 'lucide-react';
 
 export default function Footer() {
@@ -11,7 +12,15 @@ export default function Footer() {
         <div className='flex flex-col sm:flex-row justify-between items-center gap-8 mb-8 pb-8 border-b border-gray-900'>
           {/* Logo & Description */}
           <div className='flex items-center gap-3'>
-            <div className='w-6 h-6 bg-white'></div>
+            <div className='w-6 h-6 flex-shrink-0'>
+              <Image
+                src='/logo.svg'
+                alt='DESDE ARRIBA'
+                width={24}
+                height={24}
+                className='w-full h-full'
+              />
+            </div>
             <div>
               <p className='text-white font-black text-sm tracking-widest'>DESDE ARRIBA</p>
               <p className='text-gray-500 text-xs'>Fotografía aérea</p>
