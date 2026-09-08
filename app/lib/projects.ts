@@ -48,10 +48,27 @@ export const placeholderProjects: Project[] = [
   },
 ];
 
-export const isBlobConfigured = () => Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+/**
+ * Al conectar un store, Vercel deja elegir un prefijo para el token, así que
+ * no siempre se llama BLOB_READ_WRITE_TOKEN: aceptamos cualquier variante.
+ */
+export function getBlobToken(): string | undefined {
+  if (process.env.BLOB_READ_WRITE_TOKEN) return process.env.BLOB_READ_WRITE_TOKEN;
+
+  const key = Object.keys(process.env).find(
+    (name) => name.endsWith('_READ_WRITE_TOKEN') && process.env[name]
+  );
+  return key ? process.env[key] : undefined;
+}
+
+/** Nombres (nunca valores) de las variables que parecen ser del store. */
+export const blobTokenCandidates = () =>
+  Object.keys(process.env).filter((name) => name.includes('READ_WRITE_TOKEN'));
+
+export const isBlobConfigured = () => Boolean(getBlobToken());
 
 async function findProjectsBlobUrl(): Promise<string | null> {
-  const { blobs } = await list({ prefix: PROJECTS_KEY, limit: 1 });
+  const { blobs } = await list({ prefix: PROJECTS_KEY, limit: 1, token: getBlobToken() });
   return blobs[0]?.url ?? null;
 }
 
@@ -119,5 +136,6 @@ export async function saveProjects(projects: Project[]): Promise<void> {
     addRandomSuffix: false,
     allowOverwrite: true,
     cacheControlMaxAge: 60,
+    token: getBlobToken(),
   });
 }

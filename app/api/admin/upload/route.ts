@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
 import { isAuthenticated } from '@/app/lib/auth';
-import { isBlobConfigured } from '@/app/lib/projects';
+import { getBlobToken, isBlobConfigured } from '@/app/lib/projects';
 
 // Sin video/quicktime a propósito: Chrome y Android no reproducen .mov.
 const ALLOWED = [
@@ -35,6 +35,7 @@ export async function POST(request: Request) {
     const result = await handleUpload({
       body,
       request,
+      token: getBlobToken(),
       onBeforeGenerateToken: async () => ({
         allowedContentTypes: ALLOWED,
         addRandomSuffix: true,

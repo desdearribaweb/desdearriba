@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { isAdminConfigured, isAuthenticated } from '@/app/lib/auth';
-import { getProjectsForAdmin, isBlobConfigured } from '@/app/lib/projects';
+import { blobTokenCandidates, getProjectsForAdmin, isBlobConfigured } from '@/app/lib/projects';
 import LoginForm from './LoginForm';
 import ProjectsEditor from './ProjectsEditor';
 
@@ -39,6 +39,27 @@ function Notice({ title, children }: { title: string; children: React.ReactNode 
     <div className='border border-neutral-800 bg-neutral-950 p-6 sm:p-8'>
       <h2 className='mb-3 text-lg font-black tracking-wide text-white'>{title}</h2>
       <div className='space-y-3 text-sm leading-relaxed text-neutral-400'>{children}</div>
+    </div>
+  );
+}
+
+function BlobDiagnosis() {
+  const found = blobTokenCandidates();
+
+  return (
+    <div className='mt-5 border-t border-neutral-800 pt-4 text-xs text-neutral-500'>
+      {found.length === 0 ? (
+        <p>
+          Este deploy no ve <strong className='text-neutral-300'>ninguna</strong> variable de
+          storage. O el store quedó conectado a otro proyecto, o falta el redeploy del paso 2.
+        </p>
+      ) : (
+        <p>
+          Variables de storage detectadas:{' '}
+          <code className='text-neutral-300'>{found.join(', ')}</code>. Si ves esto, el token está
+          pero no se pudo usar: revisá que el store siga existiendo en Storage.
+        </p>
+      )}
     </div>
   );
 }
@@ -115,6 +136,8 @@ export default async function AdminPage() {
             </Step>
             <Step n='3.'>Cuando termine, recargá esta página.</Step>
           </ol>
+
+          <BlobDiagnosis />
         </Notice>
       </Shell>
     );
