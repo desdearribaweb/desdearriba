@@ -2,60 +2,35 @@
 
 import { useEffect, useState } from 'react';
 import { MessageCircle } from 'lucide-react';
+import { whatsappLink } from '@/app/lib/contact';
 
 export default function WhatsAppButton() {
-  const [isVisible, setIsVisible] = useState(false);
-  const [showTooltip, setShowTooltip] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      // Show after scrolling 500px
-      setIsVisible(window.scrollY > 500);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const onScroll = () => setVisible(window.scrollY > 600);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   return (
-    <>
-      {isVisible && (
-        <a
-          href='https://wa.me/5493492680779?text=Hola%20Desde%20Arriba,%20quisiera%20consultar%20por%20una%20filmaci%C3%B3n%20con%20drone'
-          className='fixed bottom-8 right-8 z-40 group transition-all duration-300'
-          onMouseEnter={() => setShowTooltip(true)}
-          onMouseLeave={() => setShowTooltip(false)}
-        >
-          {/* Tooltip */}
-          {showTooltip && (
-            <div className='absolute bottom-full right-0 mb-3 bg-white text-black px-3 py-2 rounded text-xs font-bold whitespace-nowrap animate-fade-in'>
-              Consultar por WhatsApp
-            </div>
-          )}
-
-          {/* Button */}
-          <div className='bg-white text-black p-4 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 flex items-center justify-center'>
-            <MessageCircle size={24} />
-          </div>
-        </a>
-      )}
-
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(8px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        :global(.animate-fade-in) {
-          animation: fadeIn 0.2s ease-out;
-        }
-      `}</style>
-    </>
+    <a
+      href={whatsappLink('Hola Desde Arriba, quisiera consultar por una filmación con drone.')}
+      target='_blank'
+      rel='noopener noreferrer'
+      aria-hidden={!visible}
+      tabIndex={visible ? 0 : -1}
+      className={`group fixed bottom-5 right-5 z-40 flex items-center gap-0 overflow-hidden rounded-full border border-white/20 bg-white text-black shadow-lg transition-all duration-300 sm:bottom-8 sm:right-8 ${
+        visible ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-4 opacity-0'
+      }`}
+    >
+      <span className='flex items-center justify-center p-4'>
+        <MessageCircle size={22} />
+      </span>
+      <span className='max-w-0 overflow-hidden whitespace-nowrap text-sm font-bold transition-all duration-300 group-hover:max-w-[220px] group-hover:pr-5 group-focus-visible:max-w-[220px] group-focus-visible:pr-5'>
+        Consultar por WhatsApp
+      </span>
+    </a>
   );
 }
