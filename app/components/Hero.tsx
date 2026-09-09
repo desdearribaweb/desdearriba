@@ -4,13 +4,17 @@ import { ChevronDown } from 'lucide-react';
 import { whatsappLink } from '@/app/lib/contact';
 
 // Se evalúa en build: mientras no exista el video, el hero no lo pide (evita un 404).
-const hasVideo = existsSync(path.join(process.cwd(), 'public', 'videos', 'hero.mp4'));
+const localVideo = existsSync(path.join(process.cwd(), 'public', 'videos', 'hero.mp4'))
+  ? '/videos/hero.mp4'
+  : null;
 
-export default function Hero() {
+export default function Hero({ videoUrl }: { videoUrl?: string }) {
+  const src = videoUrl ?? localVideo;
+
   return (
     <section className='relative flex min-h-[100svh] items-center justify-center overflow-hidden'>
       <div className='absolute inset-0'>
-        {hasVideo ? (
+        {src ? (
           // Un vertical 9:16 encaja perfecto en mobile; en desktop se recorta al centro.
           <video
             autoPlay
@@ -20,7 +24,7 @@ export default function Hero() {
             preload='metadata'
             className='h-full w-full object-cover'
           >
-            <source src='/videos/hero.mp4' type='video/mp4' />
+            <source src={src} type='video/mp4' />
           </video>
         ) : (
           <div className='h-full w-full bg-[radial-gradient(ellipse_at_50%_35%,#1c1c1c_0%,#000_70%)]' />
@@ -54,10 +58,10 @@ export default function Hero() {
           </a>
 
           <a
-            href='#portfolio'
+            href='#servicios'
             className='w-full border border-white/60 px-9 py-4 text-sm font-black tracking-wide text-white transition-colors hover:bg-white hover:text-black sm:w-auto'
           >
-            VER TRABAJOS
+            QUÉ FILMAMOS
           </a>
         </div>
       </div>

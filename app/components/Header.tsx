@@ -7,7 +7,6 @@ import { whatsappLink } from '@/app/lib/contact';
 
 const navLinks = [
   { label: 'Servicios', href: '#servicios' },
-  { label: 'Portfolio', href: '#portfolio' },
   { label: 'Equipo', href: '#equipo' },
   { label: 'Contacto', href: '#contacto' },
 ];
