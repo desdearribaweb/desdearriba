@@ -65,38 +65,48 @@ entero: sin eso el visitante mira una pantalla negra hasta que baja todo.
 
 Guardá siempre el crudo aparte: lo que subís al sitio es una copia para web.
 
-### Cómo exportar, paso a paso (en Mac)
+### Cómo exportar, paso a paso
 
 Safari no comprime video: es un navegador. Y los conversores online no sirven
 acá, porque tendrías que subir 700 MB a otra web antes de empezar.
 
-**CapCut** (gratis, capcut.com — el más simple para vertical)
+#### Con Final Cut Pro
 
-1. Nuevo proyecto → importás el video → lo arrastrás a la línea de tiempo.
-2. Arriba a la derecha: **Exportar**.
-3. Resolución **1080p**, Velocidad de cuadro **30**, Calidad **Recomendada**.
-4. Exportar. Queda en `.mp4` vertical, de unos 30-40 MB.
+**1. Que el proyecto sea vertical.** Al arrastrar el primer clip a una línea de
+tiempo vacía, Final Cut adopta su formato. Si quedó horizontal: seleccionás el
+proyecto → tecla `Cmd+J` → Formato de vídeo **Personalizado** → Resolución
+**1080 x 1920**.
 
-**HandBrake** (gratis, handbrake.fr — si querés más control)
+**2. Exportar.** `Archivo → Compartir → Exportar archivo` (o `Cmd+E`), pestaña
+**Ajustes**:
 
-1. Arrastrás el archivo.
-2. Preset `Fast 1080p30`.
-3. Format: **MP4**. Start.
+| Campo | Valor |
+|---|---|
+| Formato | Vídeo y audio |
+| Códec de vídeo | **H.264 Better Quality** |
+| Resolución | 1080 x 1920 |
+
+Siguiente → Guardar. Un clip de 20-30 s queda en 30-50 MB.
+
+**3. Pasarlo a `.mp4`.** Final Cut exporta en `.mov`, que el panel no acepta
+(Chrome y Android no lo reproducen). Como adentro ya está en H.264, esto solo
+cambia el envase: tarda segundos y no recomprime nada.
+
+```bash
+ffmpeg -i export.mov -c copy -movflags +faststart final.mp4
+```
+
+Si no querés usar la terminal, arrastrá el `.mov` a **HandBrake**
+(gratis, handbrake.fr), Format **MP4**, preset `Fast 1080p30`, Start.
+
+#### Sin Final Cut
+
+**CapCut** (gratis, capcut.com): importás el video → **Exportar** → 1080p, 30 fps
+→ sale `.mp4` vertical directo, sin el paso 3.
 
 > **No uses iMovie para los verticales.** iMovie trabaja en 16:9 y te mete el
 > video parado dentro de un marco horizontal, con dos barras negras a los
-> costados. Para material 9:16 arruina la toma. Sirve solo si el clip ya es
-> horizontal.
-
-**Por terminal**, si el archivo es `.mov` y ya está en H.264, esto solo le cambia
-el envase y tarda segundos, sin tocar la calidad:
-
-```bash
-ffmpeg -i entrada.mov -c copy -movflags +faststart salida.mp4
-```
-
-Si el resultado no se reproduce, estaba en H.265: usá el comando de compresión
-de más arriba, que recomprime a H.264.
+> costados. Para material 9:16 arruina la toma.
 
 ### Por qué .mp4 y no .mov
 
