@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs';
+import path from 'node:path';
 
 const specs = [
   { label: 'DRONE', value: 'DJI Mini 4 Pro' },
@@ -6,13 +8,31 @@ const specs = [
   { label: 'ESTABILIZACIÓN', value: 'Profesional' },
 ];
 
+// Se evalúa en build: si el archivo no está, la sección no lo pide (evita un 404).
+const hasVideo = existsSync(path.join(process.cwd(), 'public', 'videos', 'equipo.mp4'));
+
 export default function Equipment() {
   return (
     <section
       id='equipo'
-      className='border-t border-neutral-900 px-4 py-16 sm:px-6 sm:py-28 lg:px-8'
+      className='relative overflow-hidden border-t border-neutral-900 px-4 py-16 sm:px-6 sm:py-28 lg:px-8'
     >
-      <div className='mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2 lg:gap-20'>
+      {hasVideo && (
+        // El clip viene sobre negro puro, así que se funde con el fondo de la página.
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload='none'
+          aria-hidden='true'
+          className='pointer-events-none absolute inset-0 h-full w-full object-cover opacity-25'
+        >
+          <source src='/videos/equipo.mp4' type='video/mp4' />
+        </video>
+      )}
+
+      <div className='relative mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2 lg:gap-20'>
         <div>
           <p className='mb-3 text-[11px] font-bold tracking-[0.3em] text-neutral-500'>EQUIPO</p>
 
