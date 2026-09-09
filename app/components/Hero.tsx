@@ -58,10 +58,10 @@ export default function Hero({ videoUrl }: { videoUrl?: string }) {
           </a>
 
           <a
-            href='#portfolio'
+            href='#servicios'
             className='w-full border border-white/60 px-9 py-4 text-sm font-black tracking-wide text-white transition-colors hover:bg-white hover:text-black sm:w-auto'
           >
-            VER TRABAJOS
+            QUÉ FILMAMOS
           </a>
         </div>
       </div>

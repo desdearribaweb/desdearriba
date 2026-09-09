@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { isAdminConfigured, isAuthenticated } from '@/app/lib/auth';
 import { blobEnvNames, blobMode } from '@/app/lib/blob';
-import { getSiteDataForAdmin } from '@/app/lib/projects';
+import { getSiteDataForAdmin } from '@/app/lib/site';
 import LoginForm from './LoginForm';
-import ProjectsEditor from './ProjectsEditor';
+import SiteEditor from './SiteEditor';
 
 export const metadata: Metadata = {
   title: 'Panel | Desde Arriba',
@@ -20,7 +20,7 @@ function Shell({ children }: { children: React.ReactNode }) {
         <div className='mb-10 flex items-center justify-between gap-4'>
           <div>
             <p className='text-xs font-black tracking-[0.3em] text-white'>DESDE ARRIBA</p>
-            <p className='mt-1 text-xs text-neutral-500'>Panel de trabajos</p>
+            <p className='mt-1 text-xs text-neutral-500'>Panel</p>
           </div>
           <Link
             href='/'
@@ -153,11 +153,7 @@ export default async function AdminPage() {
 
     return (
       <Shell>
-        <ProjectsEditor
-          initialProjects={site.projects}
-          initialHeroVideo={site.heroVideo}
-          uploadMode={mode}
-        />
+        <SiteEditor initialHeroVideo={site.heroVideo} uploadMode={mode} />
       </Shell>
     );
   } catch (error) {
