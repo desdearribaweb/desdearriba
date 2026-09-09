@@ -65,34 +65,44 @@ entero: sin eso el visitante mira una pantalla negra hasta que baja todo.
 
 Guardá siempre el crudo aparte: lo que subís al sitio es una copia para web.
 
-### Tiene que ser .mp4, no .mov
+### Cómo exportar, paso a paso (en Mac)
+
+Safari no comprime video: es un navegador. Y los conversores online no sirven
+acá, porque tendrías que subir 700 MB a otra web antes de empezar.
+
+**CapCut** (gratis, capcut.com — el más simple para vertical)
+
+1. Nuevo proyecto → importás el video → lo arrastrás a la línea de tiempo.
+2. Arriba a la derecha: **Exportar**.
+3. Resolución **1080p**, Velocidad de cuadro **30**, Calidad **Recomendada**.
+4. Exportar. Queda en `.mp4` vertical, de unos 30-40 MB.
+
+**HandBrake** (gratis, handbrake.fr — si querés más control)
+
+1. Arrastrás el archivo.
+2. Preset `Fast 1080p30`.
+3. Format: **MP4**. Start.
+
+> **No uses iMovie para los verticales.** iMovie trabaja en 16:9 y te mete el
+> video parado dentro de un marco horizontal, con dos barras negras a los
+> costados. Para material 9:16 arruina la toma. Sirve solo si el clip ya es
+> horizontal.
+
+**Por terminal**, si el archivo es `.mov` y ya está en H.264, esto solo le cambia
+el envase y tarda segundos, sin tocar la calidad:
+
+```bash
+ffmpeg -i entrada.mov -c copy -movflags +faststart salida.mp4
+```
+
+Si el resultado no se reproduce, estaba en H.265: usá el comando de compresión
+de más arriba, que recomprime a H.264.
+
+### Por qué .mp4 y no .mov
 
 Un `.mov` se ve bien en Safari pero **Chrome y Android no lo reproducen**.
-Como no lo vas a notar desde tu Mac, el panel directamente no te deja subirlo.
-
-Para convertirlo, cualquiera de estas:
-
-**Si lo exportaste de un editor** (Final Cut, iMovie, Premiere, CapCut):
-volvé a exportar eligiendo **MP4 / H.264**. Es lo más rápido y sin pérdida extra.
-
-**Con iMovie** (ya viene en tu Mac): arrastrás el video → Compartir → Archivo → se
-guarda como `.mp4`.
-
-**Con Handbrake** (gratis, handbrake.fr): arrastrás el archivo, preset
-`Fast 1080p30` (o `Fast 2160p60 4K`), Start.
-
-**Por terminal**, si el `.mov` ya está en H.264 esto lo convierte en segundos
-sin recomprimir ni perder calidad:
-
-```bash
-ffmpeg -i entrada.mov -c copy salida.mp4
-```
-
-Si eso falla o el video queda sin verse, está en H.265 y hay que recomprimir:
-
-```bash
-ffmpeg -i entrada.mov -c:v libx264 -crf 23 -preset medium -c:a aac salida.mp4
-```
+Como desde tu Mac se ve perfecto, no te darías cuenta de que buena parte de la
+gente ve una pantalla en blanco. Por eso el panel no lo acepta.
 
 ---
 
