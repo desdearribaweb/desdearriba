@@ -8,18 +8,8 @@ import {
 } from '@vercel/blob/client';
 import { isAuthenticated } from '@/app/lib/auth';
 import { blobAuth, blobMode } from '@/app/lib/blob';
+import { ALLOWED_CONTENT_TYPES, MAX_UPLOAD_BYTES } from '@/app/lib/media';
 
-// Sin video/quicktime a propósito: Chrome y Android no reproducen .mov.
-const ALLOWED = [
-  'image/jpeg',
-  'image/png',
-  'image/webp',
-  'image/avif',
-  'video/mp4',
-  'video/webm',
-];
-
-const MAX_BYTES = 200 * 1024 * 1024;
 const CACHE_A_YEAR = 365 * 24 * 60 * 60;
 
 /**
@@ -49,8 +39,8 @@ export async function POST(request: Request) {
         request,
         ...blobAuth(),
         onBeforeGenerateToken: async () => ({
-          allowedContentTypes: ALLOWED,
-          maximumSizeInBytes: MAX_BYTES,
+          allowedContentTypes: ALLOWED_CONTENT_TYPES,
+          maximumSizeInBytes: MAX_UPLOAD_BYTES,
           addRandomSuffix: false,
           cacheControlMaxAge: CACHE_A_YEAR,
         }),
@@ -67,13 +57,13 @@ export async function POST(request: Request) {
         token: await issueSignedToken({
           pathname,
           operations: ['put'],
-          allowedContentTypes: ALLOWED,
-          maximumSizeInBytes: MAX_BYTES,
+          allowedContentTypes: ALLOWED_CONTENT_TYPES,
+          maximumSizeInBytes: MAX_UPLOAD_BYTES,
           ...blobAuth(),
         }),
         urlOptions: {
-          allowedContentTypes: ALLOWED,
-          maximumSizeInBytes: MAX_BYTES,
+          allowedContentTypes: ALLOWED_CONTENT_TYPES,
+          maximumSizeInBytes: MAX_UPLOAD_BYTES,
           addRandomSuffix: false,
           cacheControlMaxAge: CACHE_A_YEAR,
         },

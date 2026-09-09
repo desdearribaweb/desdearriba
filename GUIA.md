@@ -34,9 +34,36 @@ Listo: entrás a `tudominio.com/admin`.
 
 La portada se genera sola del primer frame del video: no hace falta subir una foto aparte.
 
-**Sobre los videos:** el sitio los muestra en vertical (9:16), tal cual los grabás.
-Subí el archivo ya comprimido (H.264, ~10-15 Mbps) en vez del crudo de la cámara:
-un 4K vertical de 20s queda en ~30 MB y carga rápido. El límite por archivo es 200 MB.
+### Los videos hay que exportarlos para web
+
+El sitio los muestra en vertical (9:16), tal cual los grabás. Pero el archivo que
+sale del drone (200-700 MB) es el material **crudo**: no sirve para publicar.
+
+- No entra en el almacenamiento del plan gratis (3 videos de 700 MB son 2,1 GB).
+- Cada persona que lo mire se descarga esos MB. Con unas pocas visitas se agota
+  el tráfico incluido y empieza a costar plata.
+- Desde el celular, con datos, tarda minutos en arrancar. La mayoría se va antes.
+
+El mismo clip exportado para web pesa **30-40 MB y se ve igual en un teléfono**.
+Por eso el panel no acepta archivos de más de 100 MB.
+
+**Con HandBrake** (gratis, handbrake.fr — lo más simple):
+arrastrás el archivo, preset `Fast 1080p30`, Start. Listo.
+
+**Por terminal**, para un vertical:
+
+```bash
+ffmpeg -i entrada.mp4 -vf "scale=1080:-2" -c:v libx264 -crf 23 -preset slow \
+  -c:a aac -b:a 128k -movflags +faststart salida.mp4
+```
+
+`-movflags +faststart` hace que el video empiece a reproducirse sin descargarse
+entero: sin eso el visitante mira una pantalla negra hasta que baja todo.
+
+¿Querés conservar el 4K? Cambiá `scale=1080:-2` por `scale=2160:-2` y subí el
+`-crf` a `28`. Igual, en un celular no se nota la diferencia y pesa el triple.
+
+Guardá siempre el crudo aparte: lo que subís al sitio es una copia para web.
 
 ### Tiene que ser .mp4, no .mov
 

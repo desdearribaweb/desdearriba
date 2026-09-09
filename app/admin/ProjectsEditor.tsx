@@ -4,6 +4,13 @@ import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { upload, uploadPresigned } from '@vercel/blob/client';
 import type { BlobMode } from '@/app/lib/blob';
+import {
+  MAX_UPLOAD_BYTES,
+  MAX_UPLOAD_MB,
+  RECOMMENDED_MB,
+  isQuickTime,
+  megabytes,
+} from '@/app/lib/media';
 import { PROJECT_CATEGORIES, type Project, type ProjectCategory } from '@/app/lib/projects';
 
 const MAX_PROJECTS = 3;
@@ -94,10 +101,6 @@ async function uploadToBlob(file: File, mode: BlobMode): Promise<string> {
   return blob.url;
 }
 
-/** Safari reproduce .mov, pero Chrome y Android no: hay que convertirlo antes. */
-const isQuickTime = (file: File) =>
-  file.type === 'video/quicktime' || /\.mov$/i.test(file.name);
-
 export default function ProjectsEditor({
   initialProjects,
   uploadMode,
@@ -119,6 +122,14 @@ export default function ProjectsEditor({
       setStatus({
         kind: 'error',
         text: 'Los .mov no se reproducen en Chrome ni en Android. Convertilo a .mp4 (H.264) y subilo de nuevo.',
+      });
+      return;
+    }
+
+    if (file.size > MAX_UPLOAD_BYTES) {
+      setStatus({
+        kind: 'error',
+        text: `Ese archivo pesa ${megabytes(file.size)} MB y el máximo es ${MAX_UPLOAD_MB} MB. Es el material sin comprimir: exportalo para web (1080 vertical, H.264) y queda en unos ${RECOMMENDED_MB} MB sin diferencia visible en pantalla.`,
       });
       return;
     }
@@ -192,7 +203,8 @@ export default function ProjectsEditor({
         <div>
           <h1 className='text-xl font-black tracking-wide text-white'>TUS 3 TRABAJOS</h1>
           <p className='mt-1 text-xs leading-relaxed text-neutral-500'>
-            Subí el video (o una foto) y ponele un título. La portada se genera sola.
+            Subí el video (o una foto) y ponele un título. La portada se genera sola. Exportá los
+            videos para web: hasta {MAX_UPLOAD_MB} MB, idealmente unos {RECOMMENDED_MB} MB.
           </p>
         </div>
         <button
