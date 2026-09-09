@@ -116,14 +116,19 @@ gente ve una pantalla en blanco. Por eso el panel no lo acepta.
 
 ---
 
-## Video del hero (el de fondo, arriba de todo)
+## Video de portada (el de fondo, arriba de todo)
 
-Subí tu archivo como `public/videos/hero.mp4` y hacé commit.
-Mientras no exista, el hero muestra un fondo negro degradado (no da error).
+Se sube **desde el panel**, igual que los trabajos: entrás a `/admin` y arriba
+de los tres casilleros está **VIDEO DE PORTADA** → Subir → Publicar.
 
-Tiene que ser `.mp4` (mirá arriba cómo convertir un `.mov`), y conviene que sea
-corto y liviano: 10-15 segundos en loop, bajo 8 MB. Es lo primero que carga el
-sitio, así que un archivo pesado acá se nota más que en cualquier otro lado.
+No lo subas al repositorio. GitHub rechaza archivos de más de 25 MB desde la
+web, el repo queda pesado para siempre y cada cambio te obliga a un commit.
+
+Mientras no haya video, el hero muestra un degradado negro (no da error).
+
+Que sea corto y liviano: **10-15 segundos en loop, por debajo de 10 MB**. Es lo
+primero que carga el sitio, así que acá el peso se nota más que en cualquier
+otro lado. Exportalo como cualquier otro video (ver más arriba).
 
 En celular un video vertical entra perfecto; en desktop se recorta al centro,
 así que si tenés uno horizontal, mejor usá ese acá.

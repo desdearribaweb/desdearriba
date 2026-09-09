@@ -1,9 +1,7 @@
-import { getProjects } from '@/app/lib/projects';
+import type { Project } from '@/app/lib/projects';
 import PortfolioGallery from './PortfolioGallery';
 
-export default async function Portfolio() {
-  const projects = await getProjects();
-
+export default function Portfolio({ projects }: { projects: Project[] }) {
   return (
     <section id='portfolio' className='border-t border-neutral-900 px-4 py-16 sm:px-6 sm:py-28 lg:px-8'>
       <div className='mx-auto max-w-6xl'>

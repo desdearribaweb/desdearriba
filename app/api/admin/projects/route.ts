@@ -6,8 +6,8 @@ import {
   PROJECT_CATEGORIES,
   type Project,
   type ProjectCategory,
-  getProjectsForAdmin,
-  saveProjects,
+  getSiteDataForAdmin,
+  saveSiteData,
 } from '@/app/lib/projects';
 
 const MAX_PROJECTS = 3;
@@ -21,7 +21,7 @@ export async function GET() {
     return NextResponse.json({ projects: [], blobConfigured: false });
   }
 
-  return NextResponse.json({ projects: await getProjectsForAdmin(), blobConfigured: true });
+  return NextResponse.json({ ...(await getSiteDataForAdmin()), blobConfigured: true });
 }
 
 export async function PUT(request: Request) {
@@ -35,8 +35,11 @@ export async function PUT(request: Request) {
   }
 
   let incoming: unknown;
+  let heroVideo: string | undefined;
   try {
-    incoming = (await request.json())?.projects;
+    const body = await request.json();
+    incoming = body?.projects;
+    heroVideo = typeof body?.heroVideo === 'string' && body.heroVideo ? body.heroVideo : undefined;
   } catch {
     return NextResponse.json({ error: 'Pedido inválido.' }, { status: 400 });
   }
@@ -82,8 +85,8 @@ export async function PUT(request: Request) {
     });
   }
 
-  await saveProjects(projects);
+  await saveSiteData({ heroVideo, projects });
   revalidatePath('/');
 
-  return NextResponse.json({ ok: true, projects });
+  return NextResponse.json({ ok: true, heroVideo, projects });
 }

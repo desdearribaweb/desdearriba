@@ -15,6 +15,8 @@ import {
 import { PROJECT_CATEGORIES, type Project, type ProjectCategory } from '@/app/lib/projects';
 
 const MAX_PROJECTS = 3;
+/** Índice reservado para el video de portada al reportar progreso. */
+const HERO_SLOT = -1;
 
 type Draft = {
   id: string;
@@ -111,9 +113,11 @@ async function uploadToBlob(
 
 export default function ProjectsEditor({
   initialProjects,
+  initialHeroVideo,
   uploadMode,
 }: {
   initialProjects: Project[];
+  initialHeroVideo?: string;
   uploadMode: BlobMode;
 }) {
   const router = useRouter();
@@ -121,24 +125,28 @@ export default function ProjectsEditor({
   const [status, setStatus] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
   const [saving, setSaving] = useState(false);
   const [busy, setBusy] = useState<{ index: number; percentage: number } | null>(null);
+  const [heroVideo, setHeroVideo] = useState(initialHeroVideo ?? '');
 
   const update = (index: number, patch: Partial<Draft>) =>
     setDrafts((prev) => prev.map((d, i) => (i === index ? { ...d, ...patch } : d)));
 
-  async function handleFile(index: number, file: File) {
+  /** Devuelve el motivo por el que no se puede subir, o null si está bien. */
+  function rejectionReason(file: File): string | null {
     if (isQuickTime(file)) {
-      setStatus({
-        kind: 'error',
-        text: 'Los .mov no se reproducen en Chrome ni en Android. Convertilo a .mp4 (H.264) y subilo de nuevo.',
-      });
-      return;
+      return 'Los .mov no se reproducen en Chrome ni en Android. Convertilo a .mp4 (H.264) y subilo de nuevo.';
     }
 
     if (file.size > MAX_UPLOAD_BYTES) {
-      setStatus({
-        kind: 'error',
-        text: `Ese archivo pesa ${megabytes(file.size)} MB y el máximo es ${MAX_UPLOAD_MB} MB. Es el material sin comprimir: exportalo para web (1080 vertical, H.264) y queda en unos ${RECOMMENDED_MB} MB sin diferencia visible en pantalla.`,
-      });
+      return `Ese archivo pesa ${megabytes(file.size)} MB y el máximo es ${MAX_UPLOAD_MB} MB. Es el material sin comprimir: exportalo para web (1080 vertical, H.264) y queda en unos ${RECOMMENDED_MB} MB sin diferencia visible en pantalla.`;
+    }
+
+    return null;
+  }
+
+  async function handleFile(index: number, file: File) {
+    const reason = rejectionReason(file);
+    if (reason) {
+      setStatus({ kind: 'error', text: reason });
       return;
     }
 
@@ -174,6 +182,30 @@ export default function ProjectsEditor({
     }
   }
 
+  async function handleHeroFile(file: File) {
+    const reason = rejectionReason(file);
+    if (reason) {
+      setStatus({ kind: 'error', text: reason });
+      return;
+    }
+
+    setBusy({ index: HERO_SLOT, percentage: 0 });
+    setStatus(null);
+
+    try {
+      setHeroVideo(
+        await uploadToBlob(file, uploadMode, (p) => setBusy({ index: HERO_SLOT, percentage: p }))
+      );
+    } catch (error) {
+      setStatus({
+        kind: 'error',
+        text: error instanceof Error ? error.message : 'No se pudo subir el archivo.',
+      });
+    } finally {
+      setBusy(null);
+    }
+  }
+
   async function handleSave() {
     setSaving(true);
     setStatus(null);
@@ -183,7 +215,7 @@ export default function ProjectsEditor({
     const res = await fetch('/api/admin/projects', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ projects }),
+      body: JSON.stringify({ projects, heroVideo: heroVideo || undefined }),
     });
     const data = await res.json().catch(() => ({}));
 
@@ -224,6 +256,13 @@ export default function ProjectsEditor({
         </button>
       </div>
 
+      <HeroSlot
+        videoUrl={heroVideo}
+        progress={busy?.index === HERO_SLOT ? busy.percentage : null}
+        onFile={handleHeroFile}
+        onClear={() => setHeroVideo('')}
+      />
+
       <div className='grid gap-4 sm:grid-cols-3'>
         {drafts.map((draft, index) => (
           <SlotCard
@@ -257,6 +296,79 @@ export default function ProjectsEditor({
         {saving ? 'PUBLICANDO...' : 'PUBLICAR EN EL SITIO'}
       </button>
     </div>
+  );
+}
+
+function HeroSlot({
+  videoUrl,
+  progress,
+  onFile,
+  onClear,
+}: {
+  videoUrl: string;
+  progress: number | null;
+  onFile: (file: File) => void;
+  onClear: () => void;
+}) {
+  const input = useRef<HTMLInputElement>(null);
+  const busy = progress !== null;
+
+  return (
+    <section className='border border-neutral-800 bg-neutral-950 p-4'>
+      <div className='flex flex-wrap items-center gap-4'>
+        <div className='relative aspect-video w-28 shrink-0 overflow-hidden border border-neutral-800 bg-black'>
+          {videoUrl ? (
+            <video src={videoUrl} muted playsInline className='h-full w-full object-cover' />
+          ) : (
+            <span className='flex h-full items-center justify-center text-[10px] text-neutral-600'>
+              Sin video
+            </span>
+          )}
+          {busy && (
+            <span className='absolute inset-0 flex items-center justify-center bg-black/80 text-sm font-black tabular-nums text-white'>
+              {progress}%
+            </span>
+          )}
+        </div>
+
+        <div className='min-w-0 flex-1'>
+          <h2 className='text-sm font-black tracking-wide text-white'>VIDEO DE PORTADA</h2>
+          <p className='mt-1 text-xs leading-relaxed text-neutral-500'>
+            El de fondo, arriba de todo. Sin video queda un degradado negro.
+          </p>
+        </div>
+
+        <input
+          ref={input}
+          type='file'
+          accept='video/*'
+          className='hidden'
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) onFile(file);
+            e.target.value = '';
+          }}
+        />
+
+        <div className='flex items-center gap-3'>
+          <button
+            onClick={() => input.current?.click()}
+            disabled={busy}
+            className='border border-neutral-700 px-3 py-2 text-[11px] font-bold tracking-wide text-white transition-colors hover:border-white disabled:opacity-50'
+          >
+            {busy ? 'SUBIENDO...' : videoUrl ? 'CAMBIAR' : 'SUBIR'}
+          </button>
+          {videoUrl && !busy && (
+            <button
+              onClick={onClear}
+              className='text-[11px] text-neutral-600 underline-offset-4 transition-colors hover:text-red-400 hover:underline'
+            >
+              Quitar
+            </button>
+          )}
+        </div>
+      </div>
+    </section>
   );
 }
 

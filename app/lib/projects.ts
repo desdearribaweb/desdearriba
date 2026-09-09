@@ -54,7 +54,13 @@ async function findProjectsBlobUrl(): Promise<string | null> {
   return blobs[0]?.url ?? null;
 }
 
-function sanitize(raw: unknown): Project[] {
+export interface SiteData {
+  /** Video de fondo del hero. Vacío = fondo degradado. */
+  heroVideo?: string;
+  projects: Project[];
+}
+
+function sanitizeProjects(raw: unknown): Project[] {
   if (!Array.isArray(raw)) return [];
 
   const valid = PROJECT_CATEGORIES.map((c) => c.value) as readonly string[];
@@ -79,40 +85,56 @@ function sanitize(raw: unknown): Project[] {
   });
 }
 
+/** Las versiones viejas guardaban sólo el array de proyectos. */
+function sanitizeSite(raw: unknown): SiteData {
+  if (Array.isArray(raw)) return { projects: sanitizeProjects(raw) };
+  if (!raw || typeof raw !== 'object') return { projects: [] };
+
+  const data = raw as Record<string, unknown>;
+  return {
+    heroVideo: typeof data.heroVideo === 'string' && data.heroVideo ? data.heroVideo : undefined,
+    projects: sanitizeProjects(data.projects),
+  };
+}
+
 /**
- * Devuelve los proyectos publicados. Nunca lanza: si Blob no está configurado
- * o falla, la home sigue renderizando con los placeholders.
+ * Contenido publicado. Nunca lanza: si Blob no está configurado o falla, la
+ * home sigue renderizando con los placeholders.
  */
-export async function getProjects(): Promise<Project[]> {
-  if (!isBlobConfigured()) return placeholderProjects;
+export async function getSiteData(): Promise<SiteData> {
+  const fallback: SiteData = { projects: placeholderProjects };
+  if (!isBlobConfigured()) return fallback;
 
   try {
     const url = await findProjectsBlobUrl();
-    if (!url) return placeholderProjects;
+    if (!url) return fallback;
 
     const res = await fetch(url, { next: { revalidate: 60 } });
-    if (!res.ok) return placeholderProjects;
+    if (!res.ok) return fallback;
 
-    const parsed = sanitize(await res.json());
-    return parsed.length > 0 ? parsed : placeholderProjects;
+    const site = sanitizeSite(await res.json());
+    return {
+      heroVideo: site.heroVideo,
+      projects: site.projects.length > 0 ? site.projects : placeholderProjects,
+    };
   } catch {
-    return placeholderProjects;
+    return fallback;
   }
 }
 
-/** Igual que getProjects pero sin cache y sin placeholders: para el admin. */
-export async function getProjectsForAdmin(): Promise<Project[]> {
+/** Igual que getSiteData pero sin cache y sin placeholders: para el admin. */
+export async function getSiteDataForAdmin(): Promise<SiteData> {
   const url = await findProjectsBlobUrl();
-  if (!url) return [];
+  if (!url) return { projects: [] };
 
   const res = await fetch(url, { cache: 'no-store' });
-  if (!res.ok) return [];
+  if (!res.ok) return { projects: [] };
 
-  return sanitize(await res.json());
+  return sanitizeSite(await res.json());
 }
 
-export async function saveProjects(projects: Project[]): Promise<void> {
-  await put(PROJECTS_KEY, JSON.stringify(projects, null, 2), {
+export async function saveSiteData(site: SiteData): Promise<void> {
+  await put(PROJECTS_KEY, JSON.stringify(site, null, 2), {
     access: 'public',
     contentType: 'application/json',
     addRandomSuffix: false,

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { isAdminConfigured, isAuthenticated } from '@/app/lib/auth';
 import { blobEnvNames, blobMode } from '@/app/lib/blob';
-import { getProjectsForAdmin } from '@/app/lib/projects';
+import { getSiteDataForAdmin } from '@/app/lib/projects';
 import LoginForm from './LoginForm';
 import ProjectsEditor from './ProjectsEditor';
 
@@ -149,11 +149,15 @@ export default async function AdminPage() {
   }
 
   try {
-    const projects = await getProjectsForAdmin();
+    const site = await getSiteDataForAdmin();
 
     return (
       <Shell>
-        <ProjectsEditor initialProjects={projects} uploadMode={mode} />
+        <ProjectsEditor
+          initialProjects={site.projects}
+          initialHeroVideo={site.heroVideo}
+          uploadMode={mode}
+        />
       </Shell>
     );
   } catch (error) {
