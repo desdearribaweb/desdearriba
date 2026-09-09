@@ -57,6 +57,12 @@ ffmpeg -i export.mov -c copy -movflags +faststart salida.mp4
 **HandBrake** (gratis, handbrake.fr): arrastrás el archivo, Format **MP4**,
 preset `Fast 1080p30`, Start.
 
+> **En HandBrake, con material vertical, revisá la pestaña Dimensions:**
+> `Anamorphic` tiene que estar en **None** y la resolución escrita a mano
+> (1080 x 1920). Si lo dejás en Automatic con un preset horizontal, te devuelve
+> un archivo de 1920x1080 con los píxeles deformados para simular el vertical:
+> se ve borroso y pesa el triple de lo que debería.
+
 > **No uses iMovie para los verticales.** iMovie trabaja en 16:9 y te mete el
 > video parado dentro de un marco horizontal, con dos barras negras a los
 > costados. Para material 9:16 arruina la toma.
