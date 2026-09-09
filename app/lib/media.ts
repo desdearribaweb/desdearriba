@@ -20,6 +20,12 @@ export const MAX_UPLOAD_BYTES = MAX_UPLOAD_MB * 1024 * 1024;
 
 export const RECOMMENDED_MB = 40;
 
+/**
+ * A partir de acá conviene subir en partes paralelas: es bastante más rápido
+ * que un único PUT y reintenta solo el pedazo que falló, no todo el archivo.
+ */
+export const MULTIPART_FROM_BYTES = 8 * 1024 * 1024;
+
 /** Safari reproduce .mov, pero Chrome y Android no: hay que convertirlo antes. */
 export const isQuickTime = (file: File) =>
   file.type === 'video/quicktime' || /\.mov$/i.test(file.name);

@@ -7,6 +7,7 @@ import type { BlobMode } from '@/app/lib/blob';
 import {
   MAX_UPLOAD_BYTES,
   MAX_UPLOAD_MB,
+  MULTIPART_FROM_BYTES,
   RECOMMENDED_MB,
   isQuickTime,
   megabytes,
@@ -88,7 +89,11 @@ async function posterFromVideo(file: File): Promise<File | null> {
  * El nombre se genera acá, no en el servidor: el token presignado se firma
  * contra un pathname exacto, así que tiene que coincidir con el final.
  */
-async function uploadToBlob(file: File, mode: BlobMode): Promise<string> {
+async function uploadToBlob(
+  file: File,
+  mode: BlobMode,
+  onProgress?: (percentage: number) => void
+): Promise<string> {
   const ext = (file.name.split('.').pop() ?? '').toLowerCase().replace(/[^a-z0-9]/g, '');
   const pathname = `media/${crypto.randomUUID()}${ext ? `.${ext}` : ''}`;
   const send = mode === 'token' ? upload : uploadPresigned;
@@ -96,6 +101,9 @@ async function uploadToBlob(file: File, mode: BlobMode): Promise<string> {
   const blob = await send(pathname, file, {
     access: 'public',
     handleUploadUrl: '/api/admin/upload',
+    // Parte el archivo y sube los pedazos en paralelo, reintentando los que fallen.
+    multipart: file.size > MULTIPART_FROM_BYTES,
+    onUploadProgress: onProgress ? ({ percentage }) => onProgress(percentage) : undefined,
   });
 
   return blob.url;
@@ -112,7 +120,7 @@ export default function ProjectsEditor({
   const [drafts, setDrafts] = useState<Draft[]>(() => toDrafts(initialProjects));
   const [status, setStatus] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
   const [saving, setSaving] = useState(false);
-  const [busy, setBusy] = useState<number | null>(null);
+  const [busy, setBusy] = useState<{ index: number; percentage: number } | null>(null);
 
   const update = (index: number, patch: Partial<Draft>) =>
     setDrafts((prev) => prev.map((d, i) => (i === index ? { ...d, ...patch } : d)));
@@ -134,16 +142,17 @@ export default function ProjectsEditor({
       return;
     }
 
-    setBusy(index);
+    setBusy({ index, percentage: 0 });
     setStatus(null);
+
+    const track = (percentage: number) => setBusy({ index, percentage });
 
     try {
       if (file.type.startsWith('video/')) {
         const poster = await posterFromVideo(file);
-        const [video, image] = await Promise.all([
-          uploadToBlob(file, uploadMode),
-          poster ? uploadToBlob(poster, uploadMode) : Promise.resolve(''),
-        ]);
+        const video = await uploadToBlob(file, uploadMode, track);
+        const image = poster ? await uploadToBlob(poster, uploadMode) : '';
+
         update(index, image ? { video, image } : { video });
 
         if (!image) {
@@ -153,7 +162,7 @@ export default function ProjectsEditor({
           });
         }
       } else {
-        update(index, { image: await uploadToBlob(file, uploadMode) });
+        update(index, { image: await uploadToBlob(file, uploadMode, track) });
       }
     } catch (error) {
       setStatus({
@@ -221,7 +230,7 @@ export default function ProjectsEditor({
             key={draft.id}
             index={index}
             draft={draft}
-            busy={busy === index}
+            progress={busy?.index === index ? busy.percentage : null}
             onChange={update}
             onFile={handleFile}
             onClear={() =>
@@ -254,19 +263,20 @@ export default function ProjectsEditor({
 function SlotCard({
   index,
   draft,
-  busy,
+  progress,
   onChange,
   onFile,
   onClear,
 }: {
   index: number;
   draft: Draft;
-  busy: boolean;
+  progress: number | null;
   onChange: (index: number, patch: Partial<Draft>) => void;
   onFile: (index: number, file: File) => void;
   onClear: () => void;
 }) {
   const input = useRef<HTMLInputElement>(null);
+  const busy = progress !== null;
 
   return (
     <section className='border border-neutral-800 bg-neutral-950 p-4'>
@@ -314,8 +324,17 @@ function SlotCard({
         )}
 
         {busy && (
-          <span className='absolute inset-0 flex items-center justify-center bg-black/70 text-[11px] font-bold tracking-wide text-white'>
-            SUBIENDO...
+          <span className='absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/80 px-5'>
+            <span className='text-2xl font-black tabular-nums text-white'>{progress}%</span>
+            <span className='h-0.5 w-full overflow-hidden bg-neutral-800'>
+              <span
+                className='block h-full bg-white transition-[width] duration-200'
+                style={{ width: `${progress}%` }}
+              />
+            </span>
+            <span className='text-[10px] tracking-wide text-neutral-400'>
+              {progress === 100 ? 'PROCESANDO' : 'SUBIENDO'}
+            </span>
           </span>
         )}
 
