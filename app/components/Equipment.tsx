@@ -1,64 +1,70 @@
-'use client';
 
-import Image from 'next/image';
+const specs = [
+  { label: 'DRONE', value: 'DJI Mini 4 Pro' },
+  { label: 'RESOLUCIÓN', value: '4K hasta 60 FPS' },
+  { label: 'FORMATOS', value: 'Horizontal y vertical' },
+  { label: 'ESTABILIZACIÓN', value: 'Profesional' },
+];
 
 export default function Equipment() {
-  const specs = [
-    { label: '4K', value: 'Hasta 60 FPS' },
-    { label: 'GRABACIÓN', value: 'Horizontal y Vertical' },
-    { label: 'ESTABILIZACIÓN', value: 'Profesional de 3 ejes' },
-    { label: 'DRONE', value: 'DJI Mini 4 Pro' },
-  ];
-
   return (
-    <section id='equipment' className='bg-black py-20 sm:py-32 px-4 sm:px-6 lg:px-8'>
-      <div className='max-w-7xl mx-auto'>
-        <h2 className='text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-16 sm:mb-20 tracking-tight text-center'>
-          LA TECNOLOGÍA
-          <br className='hidden sm:block' /> DETRÁS DE LA IMAGEN.
-        </h2>
+    <section
+      id='equipo'
+      className='border-t border-neutral-900 px-4 py-16 sm:px-6 sm:py-28 lg:px-8'
+    >
+      <div className='mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2 lg:gap-20'>
+        <div>
+          <p className='mb-3 text-[11px] font-bold tracking-[0.3em] text-neutral-500'>EQUIPO</p>
 
-        <div className='grid grid-cols-1 lg:grid-cols-2 gap-12 sm:gap-16 items-center'>
-          {/* Image */}
-          <div className='flex justify-center'>
-            <div className='w-full max-w-sm h-96 bg-gray-900 border-2 border-gray-800 flex items-center justify-center'>
-              <Image
-                src='/images/drone-placeholder.jpg'
-                alt='DJI Mini 4 Pro'
-                width={400}
-                height={400}
-                className='w-full h-full object-cover'
-              />
-            </div>
-          </div>
+          <h2 className='text-4xl font-black leading-[0.95] tracking-tight text-white sm:text-5xl'>
+            4K.
+            <br />
+            HORIZONTAL.
+            <br />
+            VERTICAL.
+          </h2>
 
-          {/* Specs */}
-          <div className='space-y-6 sm:space-y-8'>
-            <div>
-              <h3 className='text-3xl sm:text-4xl font-black text-white mb-2 tracking-wide'>
-                DJI MINI 4 PRO
-              </h3>
-              <p className='text-gray-400 text-sm'>Equipo profesional de captura aérea</p>
-            </div>
+          <p className='mt-6 max-w-md text-base leading-relaxed text-neutral-400'>
+            Grabamos en 4K hasta 60 FPS con DJI Mini 4 Pro, en horizontal para web y piezas
+            institucionales, y en vertical nativo para Reels, Stories y TikTok.
+          </p>
 
-            <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6'>
-              {specs.map((spec, index) => (
-                <div key={index} className='border-l-2 border-white pl-4'>
-                  <p className='text-gray-400 text-xs font-bold tracking-widest mb-1'>
-                    {spec.label}
-                  </p>
-                  <p className='text-white font-bold text-base sm:text-lg'>{spec.value}</p>
-                </div>
-              ))}
-            </div>
+          <dl className='mt-10 grid grid-cols-2 gap-x-6 gap-y-6'>
+            {specs.map((spec) => (
+              <div key={spec.label} className='border-l border-white/80 pl-4'>
+                <dt className='text-[10px] font-bold tracking-[0.2em] text-neutral-500'>
+                  {spec.label}
+                </dt>
+                <dd className='mt-1 text-sm font-bold text-white sm:text-base'>{spec.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
 
-            <div className='pt-6 sm:pt-8 border-t border-gray-800'>
-              <p className='text-gray-300 text-base leading-relaxed'>
-                Utilizamos tecnología de punta para garantizar la máxima calidad en cada toma,
-                asegurando que tus proyectos se vean cinematográficos y profesionales.
-              </p>
+        <div className='flex items-end justify-center gap-5 sm:gap-8'>
+          <figure className='w-full max-w-[210px]'>
+            <div className='flex aspect-[16/9] w-full items-center justify-center border border-neutral-700 bg-neutral-950'>
+              <span className='text-2xl font-black tracking-tight text-neutral-700'>16:9</span>
             </div>
-          </div>
+            <figcaption className='mt-3 text-[10px] font-bold leading-relaxed tracking-[0.2em] text-neutral-500'>
+              HORIZONTAL
+              <span className='mt-1 block font-medium tracking-normal text-neutral-600'>
+                YouTube · Web · Publicidad
+              </span>
+            </figcaption>
+          </figure>
+
+          <figure className='w-full max-w-[130px]'>
+            <div className='flex aspect-[9/16] w-full items-center justify-center border border-white/80 bg-neutral-950'>
+              <span className='text-2xl font-black tracking-tight text-white'>9:16</span>
+            </div>
+            <figcaption className='mt-3 text-[10px] font-bold leading-relaxed tracking-[0.2em] text-white'>
+              VERTICAL
+              <span className='mt-1 block font-medium tracking-normal text-neutral-500'>
+                Reels · Stories · TikTok
+              </span>
+            </figcaption>
+          </figure>
         </div>
       </div>
     </section>
