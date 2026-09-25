@@ -7,6 +7,7 @@ import Process from '@/app/components/Process';
 import Contact from '@/app/components/Contact';
 import Footer from '@/app/components/Footer';
 import WhatsAppButton from '@/app/components/WhatsAppButton';
+import Tracker from '@/app/components/Tracker';
 
 export default async function Home() {
   const { heroVideo } = await getSiteData();
@@ -23,6 +24,7 @@ export default async function Home() {
       </main>
       <Footer />
       <WhatsAppButton />
+      <Tracker />
     </>
   );
 }

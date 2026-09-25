@@ -1,5 +1,21 @@
 # DESDE ARRIBA — Guía rápida
 
+## Medidor de visitas
+
+Arriba de todo en `/admin`. Muestra las visitas de hoy, de los últimos 7 y 30
+días, el total, y un gráfico de los últimos 14 días (pasá el mouse por una barra
+para ver el día).
+
+Se cuenta **una visita por persona y por sesión**: si alguien recarga la página
+cinco veces cuenta una sola. No cuenta buscadores ni los previsualizadores de
+WhatsApp e Instagram. Se guarda sólo el número por día, nada de la persona: ni
+IP, ni ubicación, ni cookies de seguimiento.
+
+Es un contador propio, no una herramienta de analítica: no dice de dónde viene
+la gente ni qué miró. Si algún día querés eso, Vercel → Analytics lo trae.
+
+---
+
 ## Cambiar el video de portada
 
 Es el video de fondo del hero, arriba de todo. Se cambia desde `/admin`:
@@ -123,8 +139,8 @@ sigue diciendo que falta configurarlo.
 app/
 ├── components/     Cada sección del sitio
 ├── data/           services.ts
-├── lib/            contact.ts (WhatsApp/IG) · site.ts · auth.ts · blob.ts
-├── admin/          Panel del video de portada
+├── lib/            contact.ts (WhatsApp/IG) · site.ts · stats.ts · auth.ts
+├── admin/          Panel: visitas y video de portada
 ├── api/admin/      Login, subida y guardado
 └── page.tsx        El orden de las secciones
 ```

@@ -3,8 +3,10 @@ import Link from 'next/link';
 import { isAdminConfigured, isAuthenticated } from '@/app/lib/auth';
 import { blobEnvNames, blobMode } from '@/app/lib/blob';
 import { getSiteDataForAdmin } from '@/app/lib/site';
+import { getVisits, summarize } from '@/app/lib/stats';
 import LoginForm from './LoginForm';
 import SiteEditor from './SiteEditor';
+import Traffic from './Traffic';
 
 export const metadata: Metadata = {
   title: 'Panel | Desde Arriba',
@@ -149,11 +151,14 @@ export default async function AdminPage() {
   }
 
   try {
-    const site = await getSiteDataForAdmin();
+    const [site, visits] = await Promise.all([getSiteDataForAdmin(), getVisits()]);
 
     return (
       <Shell>
-        <SiteEditor initialHeroVideo={site.heroVideo} uploadMode={mode} />
+        <div className='space-y-8'>
+          <Traffic data={summarize(visits)} />
+          <SiteEditor initialHeroVideo={site.heroVideo} uploadMode={mode} />
+        </div>
       </Shell>
     );
   } catch (error) {
