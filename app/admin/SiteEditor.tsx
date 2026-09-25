@@ -37,6 +37,20 @@ async function uploadToBlob(
   return blob.url;
 }
 
+/**
+ * Un store privado no sirve archivos por URL, así que el video no se podría
+ * mostrar en el sitio. El error del SDK no lo explica en esos términos.
+ */
+function explicar(error: unknown): string {
+  const mensaje = error instanceof Error ? error.message : '';
+
+  if (/private store|private access/i.test(mensaje)) {
+    return 'Tu almacenamiento de Vercel es privado, así que un video subido acá no se podría ver en el sitio. Para usar esta función hace falta un store con acceso público (Storage → Create Database → Blob → Public). Mientras tanto, el video de portada se cambia reemplazando public/videos/hero.mp4 en el repositorio.';
+  }
+
+  return mensaje || 'No se pudo subir el archivo.';
+}
+
 /** Devuelve el motivo por el que no se puede subir, o null si está bien. */
 function rejectionReason(file: File): string | null {
   if (isQuickTime(file)) {
@@ -80,10 +94,7 @@ export default function SiteEditor({
     try {
       setHeroVideo(await uploadToBlob(file, uploadMode, setProgress));
     } catch (error) {
-      setStatus({
-        kind: 'error',
-        text: error instanceof Error ? error.message : 'No se pudo subir el archivo.',
-      });
+      setStatus({ kind: 'error', text: explicar(error) });
     } finally {
       setProgress(null);
     }

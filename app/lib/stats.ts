@@ -1,7 +1,9 @@
-import { BlobNotFoundError, BlobPreconditionFailedError, head, put } from '@vercel/blob';
+import { BlobPreconditionFailedError, get, put } from '@vercel/blob';
 import { blobAuth, isBlobConfigured } from './blob';
 
 const STATS_KEY = 'data/stats.json';
+/** Lo lee sólo el servidor, así que va privado: funciona con cualquier store. */
+const ACCESS = 'private' as const;
 /** Se guardan sólo los últimos meses: el panel nunca mira más atrás. */
 const KEEP_DAYS = 120;
 
@@ -29,13 +31,14 @@ function trim(visits: Visits): Visits {
 
 /** El etag acompaña al contenido: con él se escribe sin pisar a otra visita. */
 async function read(): Promise<{ visits: Visits; etag?: string }> {
+  const result = await get(STATS_KEY, { access: ACCESS, useCache: false, ...blobAuth() });
+  if (!result) return { visits: {} };
+
+  const texto = await new Response(result.stream).text();
   try {
-    const meta = await head(STATS_KEY, blobAuth());
-    const res = await fetch(meta.url, { cache: 'no-store' });
-    return { visits: res.ok ? sanitize(await res.json()) : {}, etag: meta.etag };
-  } catch (error) {
-    if (error instanceof BlobNotFoundError) return { visits: {} };
-    throw error;
+    return { visits: sanitize(JSON.parse(texto)), etag: result.blob.etag };
+  } catch {
+    return { visits: {}, etag: result.blob.etag };
   }
 }
 
@@ -66,7 +69,7 @@ export async function recordVisit(): Promise<void> {
 
     try {
       await put(STATS_KEY, JSON.stringify(trim(visits)), {
-        access: 'public',
+        access: ACCESS,
         contentType: 'application/json',
         addRandomSuffix: false,
         allowOverwrite: true,

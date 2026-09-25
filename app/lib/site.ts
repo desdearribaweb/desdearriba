@@ -1,4 +1,4 @@
-import { list, put } from '@vercel/blob';
+import { get, put } from '@vercel/blob';
 import { blobAuth, isBlobConfigured } from './blob';
 
 export interface SiteData {
@@ -8,10 +8,19 @@ export interface SiteData {
 
 // Se mantiene el nombre anterior para no perder lo ya publicado.
 const SITE_KEY = 'data/projects.json';
+/** Lo lee sólo el servidor, así que va privado: funciona con cualquier store. */
+const ACCESS = 'private' as const;
 
-async function findSiteBlobUrl(): Promise<string | null> {
-  const { blobs } = await list({ prefix: SITE_KEY, limit: 1, ...blobAuth() });
-  return blobs[0]?.url ?? null;
+async function readSite(): Promise<SiteData> {
+  const result = await get(SITE_KEY, { access: ACCESS, useCache: false, ...blobAuth() });
+  if (!result) return {};
+
+  const texto = await new Response(result.stream).text();
+  try {
+    return sanitize(JSON.parse(texto));
+  } catch {
+    return {};
+  }
 }
 
 function sanitize(raw: unknown): SiteData {
@@ -31,13 +40,7 @@ export async function getSiteData(): Promise<SiteData> {
   if (!isBlobConfigured()) return {};
 
   try {
-    const url = await findSiteBlobUrl();
-    if (!url) return {};
-
-    const res = await fetch(url, { next: { revalidate: 60 } });
-    if (!res.ok) return {};
-
-    return sanitize(await res.json());
+    return await readSite();
   } catch {
     return {};
   }
@@ -45,18 +48,12 @@ export async function getSiteData(): Promise<SiteData> {
 
 /** Igual que getSiteData pero sin cache: para el panel. */
 export async function getSiteDataForAdmin(): Promise<SiteData> {
-  const url = await findSiteBlobUrl();
-  if (!url) return {};
-
-  const res = await fetch(url, { cache: 'no-store' });
-  if (!res.ok) return {};
-
-  return sanitize(await res.json());
+  return readSite();
 }
 
 export async function saveSiteData(site: SiteData): Promise<void> {
   await put(SITE_KEY, JSON.stringify(site, null, 2), {
-    access: 'public',
+    access: ACCESS,
     contentType: 'application/json',
     addRandomSuffix: false,
     allowOverwrite: true,
