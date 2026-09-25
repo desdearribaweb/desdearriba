@@ -55,8 +55,12 @@ export async function getVisits(): Promise<Visits> {
  * en lugar de perder la cuenta ajena.
  */
 export async function recordVisit(): Promise<void> {
-  for (let intento = 0; intento < 5; intento++) {
+  // El último intento va sin candado: perder una cuenta por una carrera es
+  // mucho mejor que no contar nada si el ifMatch nunca llega a coincidir.
+  for (let intento = 0; intento < 4; intento++) {
     const { visits, etag } = await read();
+    const conCandado = Boolean(etag) && intento < 3;
+
     const day = dayKey();
     visits[day] = (visits[day] ?? 0) + 1;
 
@@ -67,7 +71,7 @@ export async function recordVisit(): Promise<void> {
         addRandomSuffix: false,
         allowOverwrite: true,
         cacheControlMaxAge: 0,
-        ...(etag ? { ifMatch: etag } : {}),
+        ...(conCandado ? { ifMatch: etag } : {}),
         ...blobAuth(),
       });
       return;
@@ -75,6 +79,8 @@ export async function recordVisit(): Promise<void> {
       if (!(error instanceof BlobPreconditionFailedError)) throw error;
     }
   }
+
+  throw new Error('No se pudo guardar la visita después de 4 intentos.');
 }
 
 export interface TrafficSummary {

@@ -14,8 +14,12 @@ export async function POST(request: Request) {
 
   try {
     await recordVisit();
-  } catch {
-    // Contar visitas nunca debe romperle la página a nadie.
+  } catch (error) {
+    // El visitante no se entera (el cliente ignora la respuesta), pero el
+    // motivo queda en los logs y a la vista para poder diagnosticarlo.
+    const motivo = error instanceof Error ? error.message : 'desconocido';
+    console.error('[track] no se pudo contar la visita:', motivo);
+    return NextResponse.json({ ok: false, error: motivo }, { status: 500 });
   }
 
   return new NextResponse(null, { status: 204 });
